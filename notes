@@ -1,0 +1,12 @@
+Backend:
+
+1 -> To initiallize backend setup in backend folder use this command: npm init -y
+2 -> To make changes in package.json file use this command: npm install
+3 -> To install dependencies use this command: npm install express mongoose nodemon cors dotenv bcryptjs jsonwebtoken cookie-parser
+4 -> To start backend use this command: npm start
+
+Frontend:
+
+1 -> To initiallize frontend setup in frontend folder use this command: npm init -y
+2 -> To install dependencies use this command: npm install react react-dom react-router-dom axios
+3 -> To start frontend use this command: npm start
