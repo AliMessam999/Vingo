@@ -10,3 +10,15 @@ Frontend:
 1 -> To initiallize frontend setup in frontend folder use this command: npm init -y
 2 -> To install dependencies use this command: npm install react react-dom react-router-dom axios
 3 -> To start frontend use this command: npm start
+
+
+Utils: 
+We use utils to write code once and use it multiple times, it works on DRY (Dont Repeat Yourself) rule.
+  => JWT Tokens
+  => Email Sender
+  => Password Compare Helper
+  => Error Handler
+  => Format Date
+  => File Uploader
+
+Config:

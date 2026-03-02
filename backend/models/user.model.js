@@ -22,7 +22,6 @@ const userSchema = new mongoose.Schema({
         enum: ["user", "owner", "deliveryBoy"],
         reruired: true
     }
-    
 }, {timestamps:true});
 
 const User = mongoose.model("User", userSchema);
