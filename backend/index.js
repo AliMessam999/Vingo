@@ -16,10 +16,10 @@ import connectDb from "./config/db.js";
 import cookieParser from "cookie-parser";
 app.use(cookieParser());
 
+app.use(express.json());
 import authRouter from "./routes/auth.routes.js";
 app.use("/api/auth", authRouter);
 
-app.use(express.json());
 
 
 app.listen(port, ()=>{

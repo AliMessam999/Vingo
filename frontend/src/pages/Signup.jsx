@@ -3,6 +3,8 @@ import { IoIosEyeOff } from "react-icons/io";
 import { IoIosEye } from "react-icons/io";
 import { FcGoogle } from "react-icons/fc";
 import { Link } from 'react-router-dom';
+import { serverUrl } from '../App';
+import axios from 'axios';
 
 
 function Signup() {
@@ -18,6 +20,15 @@ function Signup() {
   const [email, setEmail] = useState("");
   const [mobile, setMobile] = useState("");
   const [password, setPassword] = useState("");
+
+  const handleSignup = async () => {
+    try {
+      const result = await axios.post(`${serverUrl}/api/auth/signup`, {fullName, email, mobile, password, role}, {withCredentials: true})
+      console.log(result.data)
+    } catch (error) {
+      console.log(error)
+    } 
+  }
   return (
     <div className='min-h-screen flex items-center justify-center w-full' style={{backgroundColor: bgColor}}>
       <div className={`bg-white rounded-xl w-full max-w-md px-6 py-4 shadow-lg border`} style={{borderColor: borderColor}}>
@@ -35,6 +46,7 @@ function Signup() {
             onChange={(e) => {setFullName(e.target.value)}}
             value={fullName} 
             required />
+            
         </div>
         
         {/* email */}
@@ -108,6 +120,7 @@ function Signup() {
 
         {/* Sign Up Button */}
         <button type='submit' className='w-full py-2 rounded-lg font-medium transition-colors cursor-pointer transition duration-200' 
+          onClick={handleSignup}
           style={{backgroundColor: primaryColor, color: "white"}}>
           Sign Up
         </button>
@@ -122,7 +135,7 @@ function Signup() {
           <FcGoogle size={25}/>
           <span className='text-gray-700 font-medium'>Sign up with Google</span>
         </button>
-        <span className='mx-auto w-full text-gray-400 block text-center mt-2'>Already have an Account? <Link to="/signin" className='text-orange-400 hover:underline hover:text-orange-500 cursor-pointer'>Sign In</Link></span>
+        <span className='mx-auto w-full text-gray-400 block text-center mt-2'>Already have an Account? <Link to="/signin" className='text-orange-400 hover:underline hover:text-orange-500 cursor-pointer font-bold'>Sign In</Link></span>
           
       </div>
       
