@@ -7,19 +7,19 @@ export const signUp = async (req, res) => {
         const {fullName, email, password, mobile, role} = req.body;
         let user = await User.findOne({email});
         if(user){
-            console.log(user);
+            console.log('User Already Exists');
             return res.status(400).json({message: "User Already Exists"});
         }
         if(!fullName || !email || !password || !mobile) {
-            console.log(fullName, email, password, mobile)
+            console.log("All fields are required", fullName, email, password, mobile)
             return res.status(400).json({ message: "All fields are required" });
         }
         if(password.length < 8){
-            console.log(password.length)
+            console.log("Password must be at least 8 characters", password.length)
             return res.status(400).json({message: "Password must be at least 8 characters"})
         }
         if(mobile.length !== 11){
-            console.log(mobile.length)
+            console.log("Mobile number must be 11 digits", mobile.length)
             return res.status(400).json({message: "Mobile number must be 11 digits"})
         }
         const hashedpassword = await bcrypt.hash(password,10);
