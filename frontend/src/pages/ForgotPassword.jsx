@@ -4,6 +4,8 @@ import { useNavigate } from 'react-router-dom';
 import { IoIosEyeOff } from "react-icons/io";
 import { IoIosEye } from "react-icons/io";
 import { toast } from "react-toastify";
+import axios from 'axios';
+import { serverUrl } from '../App';
 
 const ForgotPassword = () => {
     const [step, setStep] = useState(1);
@@ -18,34 +20,23 @@ const ForgotPassword = () => {
 
     const sendOtp = async () => {
         try {
-            const res = await fetch("http://localhost:8000/api/auth/send-otp", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify({ email }),
-            });
-            const data = await res.json();
-            if (data.success) {
-                setOriginalOtp(data.otp);
+            const res = await axios.post(`${serverUrl}/api/auth/send-otp`, {email}, {withCredentials: true});
+
+            if (res.data.success) {
+                setOriginalOtp(res.data.otp);
                 setStep(2);
-                console.log(data.otp);
-                // console.log(originalOtp);
-                toast.success(data.message);
+                toast.success(res.data.message);
             }
             else{
-                return toast.error(data.message);
+                return toast.error(res.data.message);
             }
         } catch (error) {
-            console.log(error);
             toast.error("Failed to send OTP", error);
         }
     }
 
     const verifyOtp = () => {
         try {
-            console.log("Otp : ", otp);
-            console.log("Original Otp : ", originalOtp);
             if(otp == originalOtp ){
                 toast.success("OTP Verified");
                 setStep(3);
@@ -54,7 +45,6 @@ const ForgotPassword = () => {
                 toast.error("OTP is Invalid");
             }
         } catch (error) {
-            console.log(error);
             toast.error("Failed to verify OTP", error);
         }
     }
@@ -64,21 +54,14 @@ const ForgotPassword = () => {
             if(newPassword !== confirmPassword){
                 return toast.error("Passwords do not match");
             }
-            const res = await fetch("http://localhost:8000/api/auth/updatePassword", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify({ email, newPassword }),
-            });
-            const data = await res.json();
-            if (data.success) {
-                toast.success(data.message);
+            const res = await axios.post(`${serverUrl}/api/auth/updatePassword`, {email, newPassword}, {withCredentials: true});
+            if (res.data.success) {
+                toast.success(res.data.message);
                 setStep(1);
                 navigate("/signin");
             }
-            if(!data.success){
-                return toast.error(data.message);
+            else{
+                return toast.error(res.data.message);
             }
         } catch (error) {
             toast.error("Failed to update password", error);
@@ -120,6 +103,7 @@ const ForgotPassword = () => {
                     <div className='mb-4'>
                         <label htmlFor="otp" className='block text-gray-700 font-medium text-sm mb-1'>OTP</label>
                         <input
+                            autoFocus
                             type="number"
                             id='otp'
                             className={`w-full px-3 py-1 border rounded-lg focus:outline-orange-500 focus:border-orange-500 border-[#ddd]`}

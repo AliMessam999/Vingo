@@ -52,12 +52,12 @@ export const signIn = async (req, res) => {
         const {email, password} = req.body;
         const user = await User.findOne({email});
         if(!user){
-            return res.status(400).json({message: "User Doesnot Exist"});
+            return res.status(400).json({message: "User Doesnot Exist", success: false});
         }
 
         const isMatch = await bcrypt.compare(password, user.password);
         if(!isMatch){
-            return res.status(400).json({message: "Invalid Password"});
+            return res.status(400).json({message: "Invalid Password", success: false});
         }
 
         const token = await genToken(user._id);
@@ -71,9 +71,10 @@ export const signIn = async (req, res) => {
         return res.status(200).json({
             message: "User Signed In Successfully",
             user: user,
+            success: true
         })
     } catch (error) {
-        return res.status(500).json({ message: "Server Error" });
+        return res.status(500).json({ message: "Server Error", success: false });
     }
 }
 
@@ -94,7 +95,14 @@ export const sendOtp = async (req, res) => {
             return res.status(400).json({message: "User Doesnot Exist"});
         }
         const otp = Math.floor(1000 + Math.random() * 9000);
+        user.resetOtp = otp;
+        user.resetOtpExpiry = Date.now() + 1 * 60 * 1000;
+        user.isOtpVerified = false;
+
+        await user.save();
+
         await sendOtpMail(email, otp);
+
         return res.status(200).json({message: "OTP Sent Successfully", otp: otp, success: true });
     } catch (error) {
         return res.status(500).json({ message: "Server Error", success: false });

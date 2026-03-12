@@ -5,7 +5,7 @@ import { FcGoogle } from "react-icons/fc";
 import { Link } from 'react-router-dom';
 import { serverUrl } from '../App';
 import axios from 'axios';
-
+import { toast } from "react-toastify";
 
 function SignIn() {
   const primaryColor = "#ff4d2d";
@@ -21,9 +21,10 @@ function SignIn() {
   const handleSignin = async () => {
     try {
       const result = await axios.post(`${serverUrl}/api/auth/signin`, {email, password}, {withCredentials: true})
-      console.log(result.data)
+      
+      toast.success(result.data.message);
     } catch (error) {
-      console.log(error)
+      toast.error(error.response.data.message);
     } 
   }
   return (
