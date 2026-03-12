@@ -6,12 +6,15 @@ import Signup from './pages/Signup'
 import SignIn from './pages/SignIn'
 import ForgotPassword from './pages/ForgotPassword'
 export const serverUrl = "http://localhost:8000";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 
 function App() {
 
   return (
     <>
+      <ToastContainer />
       <Routes>
         <Route path='/signin' element={<SignIn/>} />
         <Route path='/signup' element={<Signup/>} />

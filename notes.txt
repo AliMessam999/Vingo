@@ -22,3 +22,8 @@ We use utils to write code once and use it multiple times, it works on DRY (Dont
   => File Uploader
 
 Config:
+
+
+Cluster2:
+username: waqarlizada999_db_user
+password: LIfXWmAAs1sOe9rr

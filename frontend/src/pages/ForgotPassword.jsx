@@ -3,17 +3,87 @@ import { IoArrowBack } from "react-icons/io5";
 import { useNavigate } from 'react-router-dom';
 import { IoIosEyeOff } from "react-icons/io";
 import { IoIosEye } from "react-icons/io";
-
+import { toast } from "react-toastify";
 
 const ForgotPassword = () => {
     const [step, setStep] = useState(1);
     const [email, setEmail] = useState("");
     const [otp, setOtp] = useState("");
+    const [originalOtp, setOriginalOtp] = useState("");
     const [newPassword, setNewPassword] = useState("");
     const [confirmPassword, setConfirmPassword] = useState("");
     const [showPassword, setShowPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
     const navigate = useNavigate();
+
+    const sendOtp = async () => {
+        try {
+            const res = await fetch("http://localhost:8000/api/auth/send-otp", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ email }),
+            });
+            const data = await res.json();
+            if (data.success) {
+                setOriginalOtp(data.otp);
+                setStep(2);
+                console.log(data.otp);
+                // console.log(originalOtp);
+                toast.success(data.message);
+            }
+            else{
+                return toast.error(data.message);
+            }
+        } catch (error) {
+            console.log(error);
+            toast.error("Failed to send OTP", error);
+        }
+    }
+
+    const verifyOtp = () => {
+        try {
+            console.log("Otp : ", otp);
+            console.log("Original Otp : ", originalOtp);
+            if(otp == originalOtp ){
+                toast.success("OTP Verified");
+                setStep(3);
+            }
+            else{
+                toast.error("OTP is Invalid");
+            }
+        } catch (error) {
+            console.log(error);
+            toast.error("Failed to verify OTP", error);
+        }
+    }
+
+    const updatePassword = async () => {
+        try {
+            if(newPassword !== confirmPassword){
+                return toast.error("Passwords do not match");
+            }
+            const res = await fetch("http://localhost:8000/api/auth/updatePassword", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ email, newPassword }),
+            });
+            const data = await res.json();
+            if (data.success) {
+                toast.success(data.message);
+                setStep(1);
+                navigate("/signin");
+            }
+            if(!data.success){
+                return toast.error(data.message);
+            }
+        } catch (error) {
+            toast.error("Failed to update password", error);
+        }
+    }
 
     return (
         <div className='flex w-full border justify-center min-h-screen items-center p-4 bg-[#fff9f6]'>
@@ -39,7 +109,7 @@ const ForgotPassword = () => {
                             required
                         />
                         {/* Sign Up Button */}
-                        <button type='submit' onClick={() => setStep(2)} className='w-full py-2 bg-[#ff4d2d] text-white mt-4 rounded-lg font-medium transition-colors cursor-pointer transition duration-200'
+                        <button type='submit' onClick={sendOtp} className='w-full py-2 bg-[#ff4d2d] text-white mt-4 rounded-lg font-medium transition-colors cursor-pointer transition duration-200'
                         >
                             Send OTP
                         </button>
@@ -55,11 +125,12 @@ const ForgotPassword = () => {
                             className={`w-full px-3 py-1 border rounded-lg focus:outline-orange-500 focus:border-orange-500 border-[#ddd]`}
                             placeholder='Enter OTP'
                             onChange={(e) => { setOtp(e.target.value) }}
+                            // onChange={(e) => { setOtp(Number(e.target.value)) }}
                             value={otp}
                             required
                         />
                         {/* Sign Up Button */}
-                        <button type='submit' onClick={() => setStep(3)} className='w-full py-2 bg-[#ff4d2d] text-white mt-4 rounded-lg font-medium transition-colors cursor-pointer transition duration-200'
+                        <button type='submit' onClick={verifyOtp} className='w-full py-2 bg-[#ff4d2d] text-white mt-4 rounded-lg font-medium transition-colors cursor-pointer transition duration-200'
                         // onClick={handleSignin}
                         >
                             Verify OTP
@@ -110,7 +181,7 @@ const ForgotPassword = () => {
                             </div>
                         </div> 
                         {/* Sign Up Button */}
-                        <button type='submit' onClick={() => setStep(1)} className='w-full py-2 bg-[#ff4d2d] text-white mt-4 rounded-lg font-medium transition-colors cursor-pointer transition duration-200'
+                        <button type='submit' onClick={updatePassword} className='w-full py-2 bg-[#ff4d2d] text-white mt-4 rounded-lg font-medium transition-colors cursor-pointer transition duration-200'
                         >
                             Reset Password
                         </button>
@@ -122,3 +193,5 @@ const ForgotPassword = () => {
 }
 
 export default ForgotPassword
+
+// 03:04:20

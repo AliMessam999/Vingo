@@ -1,6 +1,7 @@
 import User from "../models/user.model.js";
 import bcrypt from "bcryptjs"
 import genToken from "../utils/token.js";
+import { sendOtpMail } from "../utils/mail.js";
 
 export const signUp = async (req, res) => {
     try {
@@ -84,3 +85,50 @@ export const signOut = async (req, res) => {
         return res.status(500).json({ message: "Server Error" });
     }
 }
+
+export const sendOtp = async (req, res) => {
+    try {
+        const {email} = req.body;
+        const user = await User.findOne({email});
+        if(!user){
+            return res.status(400).json({message: "User Doesnot Exist"});
+        }
+        const otp = Math.floor(1000 + Math.random() * 9000);
+        await sendOtpMail(email, otp);
+        return res.status(200).json({message: "OTP Sent Successfully", otp: otp, success: true });
+    } catch (error) {
+        return res.status(500).json({ message: "Server Error", success: false });
+    }
+}
+
+export const update = async (req, res) => {
+    try {
+        const { email, newPassword } = req.body;
+
+        const user = await User.findOne({ email });
+
+        if (!user) {
+            return res.status(400).json({ message: "User Doesnot Exist", success: false });
+        }
+
+        if (newPassword.length < 8) {
+            return res.status(400).json({ message: "Password must be at least 8 characters", success: false });
+        }
+
+        // hash new password
+        const hashedPassword = await bcrypt.hash(newPassword, 10);
+
+        // update password
+        user.password = hashedPassword;
+        await user.save();
+
+        return res.status(200).json({
+            message: "Password Updated Successfully",
+            success: true
+        });
+
+    } catch (error) {
+        console.error("Update Password Error:", error);
+        return res.status(500).json({ message: "Server Error", success: false });
+    }
+};
