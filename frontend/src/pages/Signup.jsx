@@ -5,6 +5,8 @@ import { FcGoogle } from "react-icons/fc";
 import { Link } from 'react-router-dom';
 import { serverUrl } from '../App';
 import axios from 'axios';
+import { GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
+import { auth } from '../../firebase';
 
 
 function Signup() {
@@ -28,6 +30,20 @@ function Signup() {
     } catch (error) {
       console.log(error)
     } 
+  }
+
+  const handleGoogleAuth = async () => {
+    try {
+        if(!mobile){
+          return alert("Please enter your mobile number");
+        }
+        const provider = new GoogleAuthProvider();
+        const result = await signInWithPopup(auth, provider);
+        const resultTwo = await axios.post(`${serverUrl}/api/auth/google-auth`, {fullName: result.user.displayName, email: result.user.email, mobile: mobile, role: role }, {withCredentials: true})
+        console.log(resultTwo.data);
+    } catch (error) {
+      console.log(error)
+    }
   }
   return (
     <div className='min-h-screen flex items-center justify-center w-full' style={{backgroundColor: bgColor}}>
@@ -131,7 +147,7 @@ function Signup() {
           <hr className='flex-1' />
         </div>
         {/* Google Button */}
-        <button className='w-full flex items-center justify-center cursor-pointer gap-2 transition duration-200 hover:bg-gray-200 border border-[#ddd] p-2 rounded-sm' style={{}}>
+        <button className='w-full flex items-center justify-center cursor-pointer gap-2 transition duration-200 hover:bg-gray-200 border border-[#ddd] p-2 rounded-sm' onClick={handleGoogleAuth}>
           <FcGoogle size={25}/>
           <span className='text-gray-700 font-medium'>Sign up with Google</span>
         </button>

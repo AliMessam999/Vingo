@@ -140,3 +140,31 @@ export const update = async (req, res) => {
         return res.status(500).json({ message: "Server Error", success: false });
     }
 };
+
+export const googleAuth = async (req, res) => {
+    try {
+        const {email, fullName, mobile, role} = req.body;
+        let user = await User.findOne({email});
+        if(!user){
+            user = await User.create({
+                email, fullName, mobile, role
+            })
+        }
+
+        const token = await genToken(user._id);
+        res.cookie("token", token,{
+            secure: false,
+            samesite: "strict",
+            maxAge: 7 * 24 * 60 * 60 * 1000,
+            httpOnly: true
+        });
+
+        return res.status(200).json(user);
+        // if(user){
+        //     return res.status(400).json({message: "User Already Exists", success: false});
+        // }
+        
+    } catch (error) {
+        return res.status(500).json({message: "Google Auth Error", success: false});
+    }
+}
