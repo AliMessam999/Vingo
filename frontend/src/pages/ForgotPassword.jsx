@@ -6,6 +6,7 @@ import { IoIosEye } from "react-icons/io";
 import { toast } from "react-toastify";
 import axios from 'axios';
 import { serverUrl } from '../App';
+import { ClipLoader } from 'react-spinners';
 
 const ForgotPassword = () => {
     const [step, setStep] = useState(1);
@@ -16,55 +17,77 @@ const ForgotPassword = () => {
     const [confirmPassword, setConfirmPassword] = useState("");
     const [showPassword, setShowPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+    const [error, setError] = useState("");
+    const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
 
     const sendOtp = async () => {
         try {
+            setLoading(true);
             const res = await axios.post(`${serverUrl}/api/auth/send-otp`, {email}, {withCredentials: true});
 
             if (res.data.success) {
                 setOriginalOtp(res.data.otp);
                 setStep(2);
                 toast.success(res.data.message);
+                setError("");
             }
             else{
-                return toast.error(res.data.message);
+                // return toast.error(res.data.message);
+                setError(res.data.message);
             }
         } catch (error) {
-            toast.error("Failed to send OTP", error);
+            // toast.error("Failed to send OTP", error);
+            setError(error.response.data.message);
+        } finally {
+            setLoading(false);
         }
     }
 
     const verifyOtp = () => {
         try {
+            setLoading(true);
             if(otp == originalOtp ){
                 toast.success("OTP Verified");
                 setStep(3);
+                setError("");
             }
             else{
-                toast.error("OTP is Invalid");
+                // toast.error("OTP is Invalid");
+                setError("OTP is Invalid");
             }
         } catch (error) {
-            toast.error("Failed to verify OTP", error);
+            // toast.error("Failed to verify OTP", error);
+            setError(error.response.data.message);
+        }
+        finally {
+            setLoading(false);
         }
     }
 
     const updatePassword = async () => {
         try {
+            setLoading(true);
             if(newPassword !== confirmPassword){
-                return toast.error("Passwords do not match");
+                // return toast.error("Passwords do not match");
+                setError("Passwords do not match");
             }
             const res = await axios.post(`${serverUrl}/api/auth/updatePassword`, {email, newPassword}, {withCredentials: true});
             if (res.data.success) {
                 toast.success(res.data.message);
                 setStep(1);
                 navigate("/signin");
+                setError("");
             }
             else{
-                return toast.error(res.data.message);
+                // return toast.error(res.data.message);
+                setError(res.data.message);
             }
         } catch (error) {
-            toast.error("Failed to update password", error);
+            // toast.error("Failed to update password", error);
+            setError(error.response.data.message);
+        } finally {
+            setLoading(false);
         }
     }
 
@@ -76,9 +99,11 @@ const ForgotPassword = () => {
                         <IoArrowBack size={25} />
                     </button>
                     <h1 className={`text-2xl font-bold text-center mx-auto  text-[#ff4d2d]`}>
-                        Forgot Password
+                        Forgot Password 
                     </h1>
+                    {/* <br /> */}
                 </div>
+                {error && <p className='text-red-500 text-sm text-center'>{error}</p>}
                 {step === 1 && (
                     <div className='mb-4'>
                         <label htmlFor="email" className='block text-gray-700 font-medium text-sm mb-1'>Email</label>
@@ -91,10 +116,11 @@ const ForgotPassword = () => {
                             value={email}
                             required
                         />
+                       
                         {/* Sign Up Button */}
-                        <button type='submit' onClick={sendOtp} className='w-full py-2 bg-[#ff4d2d] text-white mt-4 rounded-lg font-medium transition-colors cursor-pointer transition duration-200'
+                        <button type='submit' onClick={sendOtp} disabled={loading} className='w-full py-2 bg-[#ff4d2d] text-white mt-4 rounded-lg font-medium transition-colors cursor-pointer transition duration-200'
                         >
-                            Send OTP
+                            {loading ? <ClipLoader color='white' size={15} className='' /> : "Send OTP"}
                         </button>
                     </div>
                 )}
@@ -114,10 +140,10 @@ const ForgotPassword = () => {
                             required
                         />
                         {/* Sign Up Button */}
-                        <button type='submit' onClick={verifyOtp} className='w-full py-2 bg-[#ff4d2d] text-white mt-4 rounded-lg font-medium transition-colors cursor-pointer transition duration-200'
+                        <button type='submit' onClick={verifyOtp} disabled={loading} className='w-full py-2 bg-[#ff4d2d] text-white mt-4 rounded-lg font-medium transition-colors cursor-pointer transition duration-200'
                         // onClick={handleSignin}
                         >
-                            Verify OTP
+                            {loading ? <ClipLoader color='white' size={15} className='' /> : "Verify OTP"}
                         </button>
                     </div>
                 )}
@@ -165,9 +191,9 @@ const ForgotPassword = () => {
                             </div>
                         </div> 
                         {/* Sign Up Button */}
-                        <button type='submit' onClick={updatePassword} className='w-full py-2 bg-[#ff4d2d] text-white mt-4 rounded-lg font-medium transition-colors cursor-pointer transition duration-200'
+                        <button type='submit' onClick={updatePassword} disabled={loading} className='w-full py-2 bg-[#ff4d2d] text-white mt-4 rounded-lg font-medium transition-colors cursor-pointer transition duration-200'
                         >
-                            Reset Password
+                            {loading ? <ClipLoader color='white' size={15} className='' /> : "Reset Password"}
                         </button>
                     </>
                 )}

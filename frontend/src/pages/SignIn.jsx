@@ -8,6 +8,7 @@ import axios from 'axios';
 import { toast } from "react-toastify";
 import { GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
 import { auth } from '../../firebase';
+import { ClipLoader } from 'react-spinners';
 
 function SignIn() {
   const primaryColor = "#ff4d2d";
@@ -16,18 +17,23 @@ function SignIn() {
   const borderColor = "#ddd";
 
   const [showPassword, setShowPassword] = useState(false);
-
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const handleSignin = async () => {
     try {
+      setLoading(true);
       const result = await axios.post(`${serverUrl}/api/auth/signin`, {email, password}, {withCredentials: true})
-      
       toast.success(result.data.message);
+      setError("");
     } catch (error) {
-      toast.error(error.response.data.message);
-    } 
+      // toast.error(error.response.data.message);
+      setError(error.response.data.message);
+    } finally {
+      setLoading(false);
+    }
   }
 
   const handleGoogleAuth = async () => {
@@ -36,8 +42,9 @@ function SignIn() {
         const result = await signInWithPopup(auth, provider);
         const resultTwo = await axios.post(`${serverUrl}/api/auth/google-auth`, {email: result.user.email }, {withCredentials: true})
         console.log(resultTwo.data);
+        setError("");
     } catch (error) {
-      console.log(error)
+      setError(error.response.data.message);
     }
   }
   return (
@@ -45,6 +52,7 @@ function SignIn() {
       <div className={`bg-white rounded-xl w-full max-w-md px-6 py-4 shadow-lg border`} style={{borderColor: borderColor}}>
         <h1 className={`text-2xl font-bold text-center`} style={{color: primaryColor}}>Vingo</h1>
         <p className={`text-center text-gray-500 mb-1`}>Signin to your account</p>
+        {error && <p className='text-red-500 text-sm text-center'>{error}</p>}
        
         
         {/* email */}
@@ -88,9 +96,9 @@ function SignIn() {
 
         {/* Sign Up Button */}
         <button type='submit' className='w-full py-2 rounded-lg font-medium transition-colors cursor-pointer transition duration-200' 
-          onClick={handleSignin}
+          onClick={handleSignin} disabled={loading}
           style={{backgroundColor: primaryColor, color: "white"}}>
-          Sign In
+           {loading ? <ClipLoader color='white' size={15} className='' /> : "Sign In"}
         </button>
         {/* Or */}
         <div className="flex items-center justify-center gap-2 my-2 text-gray-400">

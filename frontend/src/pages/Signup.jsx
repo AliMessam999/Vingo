@@ -7,6 +7,8 @@ import { serverUrl } from '../App';
 import axios from 'axios';
 import { GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
 import { auth } from '../../firebase';
+import { toast } from "react-toastify";
+import { ClipLoader } from 'react-spinners';
 
 
 function Signup() {
@@ -22,34 +24,43 @@ function Signup() {
   const [email, setEmail] = useState("");
   const [mobile, setMobile] = useState("");
   const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const handleSignup = async () => {
     try {
+      setLoading(true);
       const result = await axios.post(`${serverUrl}/api/auth/signup`, {fullName, email, mobile, password, role}, {withCredentials: true})
-      console.log(result.data)
+      toast.success("User Registered Successfully");
+      console.log(result.data);
+      setError("");
     } catch (error) {
-      console.log(error)
-    } 
+      setError(error.response.data.message);
+    } finally {
+      setLoading(false);
+    }
   }
 
   const handleGoogleAuth = async () => {
     try {
         if(!mobile){
-          return alert("Please enter your mobile number");
+          return setError("Please enter your mobile number");
         }
         const provider = new GoogleAuthProvider();
         const result = await signInWithPopup(auth, provider);
         const resultTwo = await axios.post(`${serverUrl}/api/auth/google-auth`, {fullName: result.user.displayName, email: result.user.email, mobile: mobile, role: role }, {withCredentials: true})
         console.log(resultTwo.data);
+        setError("");
     } catch (error) {
-      console.log(error)
+      setError(error.response.data.message);
     }
   }
   return (
     <div className='min-h-screen flex items-center justify-center w-full' style={{backgroundColor: bgColor}}>
       <div className={`bg-white rounded-xl w-full max-w-md px-6 py-4 shadow-lg border`} style={{borderColor: borderColor}}>
         <h1 className={`text-2xl font-bold text-center`} style={{color: primaryColor}}>Vingo</h1>
-        <p className={`text-center text-gray-500 mb-1`}>Create your account</p>
+        <p className={`text-center text-gray-500`}>Create your account</p>
+        {error && <p className='text-red-500 text-sm text-center'>{error}</p>}
         {/* fullName */}
         <div className='mb-1'>
           <label htmlFor="fullName" className='block text-gray-700 font-medium text-sm mb-1'>Full Name</label>
@@ -137,9 +148,11 @@ function Signup() {
         {/* Sign Up Button */}
         <button type='submit' className='w-full py-2 rounded-lg font-medium transition-colors cursor-pointer transition duration-200' 
           onClick={handleSignup}
+          disabled={loading}
           style={{backgroundColor: primaryColor, color: "white"}}>
-          Sign Up
+          {loading ? <ClipLoader color='white' size={15} className='' /> : "Sign Up"}
         </button>
+        
         {/* Or */}
         <div className="flex items-center justify-center gap-2 my-2 text-gray-400">
           <hr className='flex-1' />
