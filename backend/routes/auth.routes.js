@@ -1,12 +1,12 @@
 import express from "express";
 import { signUp, signIn, signOut, sendOtp, update, googleAuth } from "../controllers/auth.controller.js";
 
-const router = express.Router();
+const authRouter = express.Router();
 
-router.post("/signup", signUp);
-router.post("/signin", signIn);
-router.get("/signout", signOut);
-router.post("/send-otp", sendOtp);
-router.post("/updatePassword", update);
-router.post("/google-auth", googleAuth);
-export default router;
+authRouter.post("/signup", signUp);
+authRouter.post("/signin", signIn);
+authRouter.get("/signout", signOut);
+authRouter.post("/send-otp", sendOtp);
+authRouter.post("/updatePassword", update);
+authRouter.post("/google-auth", googleAuth);
+export default authRouter;

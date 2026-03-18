@@ -1,24 +1,25 @@
 import express from "express";
-const app = express();
-
 import dotenv from "dotenv";
 dotenv.config();
-const port = process.env.PORT || 5000;
+import connectDb from "./config/db.js";
+import cookieParser from "cookie-parser";
+import authRouter from "./routes/auth.routes.js";
+import userRouter from "./routes/user.routes.js";
 
 import cors from "cors";
+const app = express();
+const port = process.env.PORT || 5000;
+
 app.use(cors({
     origin: "http://localhost:5173",
     credentials: true
 }));
 
-import connectDb from "./config/db.js";
-
-import cookieParser from "cookie-parser";
-app.use(cookieParser());
 
 app.use(express.json());
-import authRouter from "./routes/auth.routes.js";
+app.use(cookieParser());
 app.use("/api/auth", authRouter);
+app.use("/api/user", userRouter);
 
 
 
