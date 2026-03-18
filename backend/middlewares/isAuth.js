@@ -10,7 +10,7 @@ export const isAuth = (req, res, next) => {
             return res.status(401).json({message: "User Not Found"});
         }
         console.log(decodedToken);
-        req.userId = decodedToken;
+        req.userId = decodedToken.userId;
         next();
     } catch (error) {
         return res.status(500).json({message: "Internal server error"});
